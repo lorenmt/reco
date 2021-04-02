@@ -337,7 +337,7 @@ class BuildDataLoader:
     def __init__(self, dataset, num_labels):
         self.dataset = dataset
         if dataset == 'pascal':
-            self.data_path = 'dataset/voc_dataset'
+            self.data_path = 'dataset/pascal'
             self.im_size = [513, 513]
             self.crop_size = [321, 321]
             self.num_segments = 21

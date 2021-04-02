@@ -13,8 +13,9 @@ def natural_key(string_):
     """See https://blog.codinghorror.com/sorting-for-humans-natural-sort-order/"""
     return [int(s) if s.isdigit() else s for s in re.split(r'(\d+)', string_)]
 
-# load true test index
 root = 'dataset/sun'
+
+# load true test index
 idx_list = []
 with open(root + '/test_idx.txt') as f:
     for l in f:

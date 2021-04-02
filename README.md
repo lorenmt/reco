@@ -21,7 +21,7 @@ In this paper, we introduce two different training modes for semi-supervised lea
 1. Full Labels Partial Dataset: A sparse subset of training images has full ground-truth labels, with the remaining data unlabelled.
 2. Partial Labels Full Dataset: All images have some labels, but covering only a sparse subset of pixels.
 
-Running the following four scripts would train each mode with supervised or semi-superivsed methods respectively.
+Running the following four scripts would train each mode with supervised or semi-supervised methods respectively.
 ```
 python train_sup.py             # Supervised learning with full labels.
 python train_semisup.py         # Semi-supervised learning with full labels.
@@ -30,12 +30,12 @@ python train_semisup_patial.py  # Semi-supervised learning with partial labels.
 ```
 
 ## Important Flags
-All supervised and semi-supervised methods can be trained with different flags (hyper-parameters) when running each training script. The folllowing briefly introduces some important flags for the experiments.
+All supervised and semi-supervised methods can be trained with different flags (hyper-parameters) when running each training script. The following briefly introduces some important flags for the experiments.
 
 | Flag Name        | Usage  |  Comments |
 | ------------- |-------------| -----|
 | `num_labels`     | number of labelled images in the training set, choose `0` for training all labelled images  | only available in the full label mode,  |
-| `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixels respecitvely  | only available in the partial label mode |
+| `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixels respectively  | only available in the partial label mode |
 | `num_negatives` | number of negative keys sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `num_queries` | number of queries sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `output_dim` | dimensionality for pixel-level representation | only applied when training with ReCo loss|

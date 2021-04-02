@@ -9,8 +9,8 @@ from PIL import Image
 from module_list import *
 
 
-im_root = 'dataset/voc_dataset/JPEGImages'
-label_root = 'dataset/voc_dataset/SegmentationClassAug'
+im_root = 'dataset/pascal/JPEGImages'
+label_root = 'dataset/pascal/SegmentationClassAug'
 
 
 for seed in range(3):

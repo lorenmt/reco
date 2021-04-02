@@ -67,7 +67,7 @@ python train_sup.py --dataset {DATASET} --num_labels 0 --apply_reco
 Training with ReCo is expected to require 12 - 16G of memory in a single GPU setting. All the other baselines can be trained under 12G in a single GPU setting.
 
 ### Other Notices
-1. We observe that the performance for the full label mode semi-supervised learning in CityScapes dataset is not stable across different machines, for which all baselines might drop 2-5% performance, though the ranking for all methods keeps the same. Different GPUs in the same machine do not affact the performance.  The performance for other datasets in the full label mode and all datasets in the partial label mode are consistent. 
+1. We observe that the performance for the full label semi-supervised setting in CityScapes dataset is not stable across different machines, for which all methods might drop 2-5% performance, though the ranking keeps the same. Different GPUs in the same machine do not affect the performance.  The performance for the other datasets in the full label mode and the performance for all datasets in the partial label mode is consistent. 
 2.  Please use `--seed 0, 1, 2` to accurately reproduce/compare our results with the exactly same labelled and unlabelled split we used in our experiments.
 
 ## Citation

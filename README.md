@@ -2,17 +2,19 @@
 
 This repository contains the source code of Regional Contrast (ReCo) and baselines from the paper, [Bootstrapping Semantic Segmentation with Regional Contrast](https://shikun.io/assets/reco/reco.pdf), introduced by [Shikun Liu](https://shikun.io/), [Shuaifeng Zhi](https://shuaifengzhi.com/), [Edward Johns](https://www.robot-learning.uk/), and [Andrew Davison](https://www.doc.ic.ac.uk/~ajd/).
 
+Check out [the project page](https://shikun.io/projects/regional-contrast) for more visualisations.
+
 
 ## Datasets
-ReCo is evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D**, from which **CityScapes** and **PASCAL VOC** are further evaluated with partial label mode. 
+ReCo is evaluated with three datasets **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, from which **CityScapes** and **PASCAL VOC** are additionally evaluated with partial label mode. 
 
-- For CityScapes dataset, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/) and create and place it to the corresponding `dataset/cityscapes` folder.
-- For Pascal VOC dataset, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip). Place the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/cityscapes` folder.
-- For SUN RGB-D datsaet, please download the train dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-train_images.tgz), test dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-test_images.tgz) and labels [here](https://github.com/ankurhanda/sunrgbd-meta-data/raw/master/sunrgbd_train_test_labels.tar.gz). And place them into the corresponding `dataset/sun` folder. 
+- For CityScapes, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/): `leftImg8bit_trainvaltest.zip` and `gtFine_trainvaltest.zip`. Create and extract them to the corresponding `dataset/cityscapes` folder.
+- For Pascal VOC, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar): `VOCtrainval_11-May-2012.tar` and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip): `SegmentationClassAug.zip`. Extract the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/pascal` folder.
+- For SUN RGB-D, please download the train dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-train_images.tgz): `SUNRGBD-train_images.tgz`, test dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-test_images.tgz): `SUNRGBD-test_images.tgz` and labels [here](https://github.com/ankurhanda/sunrgbd-meta-data/raw/master/sunrgbd_train_test_labels.tar.gz): `sunrgbd_train_test_labels.tar.gz`. Extract and place them into the corresponding `dataset/sun` folder. 
 
-After making sure all datasets having been placed and downlowned successfully, run each processing file `python dataset/{DATASET}_preprocess.py` in the dataset respectively to prepare each dataset. The preprocessing file also includes generating partial label for Cityscapes and Pascal dataset with three random seeds. Feel free to modify the partial label size and random seed to suit your own research setting.
+After making sure all datasets having been placed and downloaded successfully, run each processing file `python dataset/{DATASET}_preprocess.py` in the dataset respectively to pre-process each dataset for the experiments. The preprocessing file also includes generating partial label for Cityscapes and Pascal dataset with three random seeds. Feel free to modify the partial label size and random seed to suit your own research setting.
 
-For the lazy ones: just download the pre-processed datasets here [CityScapes](https://www.dropbox.com/sh/1eeq4qi9g2n6la2/AAD4IK1oskNPUzfTuusMqfb7a?dl=0), [Pascal VOC](https://www.dropbox.com/sh/gaoqumpylcci3he/AABjenlsGet060yhGXVxobE4a?dl=0) and [SUN RGB-D](https://www.dropbox.com/sh/miq8361xxbricp5/AAD8E74uWKwELbHmhAyGshCfa?dl=0).
+For the lazy ones: just download the off-the-shelf pre-processed datasets here [CityScapes](https://www.dropbox.com/sh/1eeq4qi9g2n6la2/AAD4IK1oskNPUzfTuusMqfb7a?dl=0), [Pascal VOC](https://www.dropbox.com/sh/gaoqumpylcci3he/AABjenlsGet060yhGXVxobE4a?dl=0) and [SUN RGB-D](https://www.dropbox.com/sh/miq8361xxbricp5/AAD8E74uWKwELbHmhAyGshCfa?dl=0).
 
 ## Training Supervised and Semi-supervised Models
 In this paper, we introduce two different training modes for semi-supervised learning.
@@ -28,7 +30,7 @@ python train_semisup_patial.py  # Semi-supervised learning with partial labels.
 ```
 
 ## Important Flags
-Both supervised and semi-supervised methods can be trained with different flags (hyper-parameters) by adding `--{FLAG_NAME} {FLAG_OPTION}` when running each training script. Below are the brief introduction to some important flags for the experiments.
+All supervised and semi-supervised methods can be trained with different flags (hyper-parameters) when running each training script. The folllowing briefly introduces some important flags for the experiments.
 
 | Flag Name        | Usage  |  Comments |
 | ------------- |-------------| -----|
@@ -36,9 +38,9 @@ Both supervised and semi-supervised methods can be trained with different flags 
 | `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixels respecitvely  | only available in the partial label mode |
 | `num_negatives` | number of negative keys sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `num_queries` | number of queries sampled for each class in each mini-batch | only applied when training with ReCo loss|
-| `output_dim` | output dimension for pixel-level representation | only applied when training with ReCo loss|
+| `output_dim` | dimensionality for pixel-level representation | only applied when training with ReCo loss|
 | `temp` | temperature used in contrastive learning | only applied when training with ReCo loss|
-| `apply_aug` | semi-supervised methods for data augmentation, choose `cutout, cutmix, classmix` | only available in the semi-supervised methods for our implementations for [CutOut, CutMix](https://arxiv.org/abs/1906.01916) and [ClassMix](https://arxiv.org/abs/2007.07936)|
+| `apply_aug` | semi-supervised methods for data augmentation, choose `cutout, cutmix, classmix` | only available in the semi-supervised methods; our implementations for [CutOut, CutMix](https://arxiv.org/abs/1906.01916) and [ClassMix](https://arxiv.org/abs/2007.07936)|
 | `weak_threshold` | weak threshold `delta_w` in active sampling | only applied when training with ReCo loss|
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
 | `apply_reco` | toggle on or off | apply with our proposed ReCo loss|
@@ -55,6 +57,11 @@ Training ReCo + ClassMix with the fewest **partial** label setting in each datas
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset sun --partial p0 --apply_aug classmix --apply_reco
+```
+
+Training ReCo + Supervised with all labelled data.
+```
+python train_sup.py --dataset {DATASET} --num_labels 0 --apply_reco
 ```
 
 Training with ReCo is expected to require 12 - 16G of memory in a single GPU setting. All the other baselines can be trained under 12G in a single GPU setting.

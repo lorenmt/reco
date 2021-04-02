@@ -4,13 +4,11 @@ This repository contains the source code of Regional Contrast (ReCo) and baselin
 
 
 ## Datasets
-ReCo is evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D**, from which **CityScapes** and **PASCAL VOC** are further evaluated with partial label mode. To begin with, please first create three directories `cityscapes`, `voc_dataset` and `sun` under `dataset` folder.
+ReCo is evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D**, from which **CityScapes** and **PASCAL VOC** are further evaluated with partial label mode. 
 
--- For CityScapes dataset, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/) and place it to the corresponding `dataset/cityscapes` folder.
-
--- For Pascal VOC dataset, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip). Place the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/cityscapes` folder.
-
--- For SUN RGB-D datsaet, please download the train dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-train_images.tgz), test dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-test_images.tgz) and labels [here](https://github.com/ankurhanda/sunrgbd-meta-data/raw/master/sunrgbd_train_test_labels.tar.gz). And place them into the corresponding `dataset/sun` folder. 
+- For CityScapes dataset, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/) and create and place it to the corresponding `dataset/cityscapes` folder.
+- For Pascal VOC dataset, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar) and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip). Place the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/cityscapes` folder.
+- For SUN RGB-D datsaet, please download the train dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-train_images.tgz), test dataset [here](http://www.doc.ic.ac.uk/~ahanda/SUNRGBD-test_images.tgz) and labels [here](https://github.com/ankurhanda/sunrgbd-meta-data/raw/master/sunrgbd_train_test_labels.tar.gz). And place them into the corresponding `dataset/sun` folder. 
 
 After making sure all datasets having been placed and downlowned successfully, run each processing file `python dataset/{DATASET}_preprocess.py` in the dataset respectively to prepare each dataset. The preprocessing file also includes generating partial label for Cityscapes and Pascal dataset with three random seeds. Feel free to modify the partial label size and random seed to suit your own research setting.
 
@@ -21,7 +19,7 @@ In this paper, we introduce two different training modes for semi-supervised lea
 1. Full Labels Partial Dataset: A sparse subset of training images has full ground-truth labels, with the remaining data unlabelled.
 2. Partial Labels Full Dataset: All images have some labels, but covering only a sparse subset of pixels.
 
-Running the following four files would reprentating each mode respective:
+Running the following four scripts would train each mode with supervised or semi-superivsed methods respectively.
 ```
 python train_sup.py             # Supervised learning with full labels.
 python train_semisup.py         # Semi-supervised learning with full labels.
@@ -30,7 +28,7 @@ python train_semisup_patial.py  # Semi-supervised learning with partial labels.
 ```
 
 ## Important Flags
-Both supervised and semi-supervised methods can be trained with different flags (hyper-parameters) by adding `--{FLAG_NAME} {FLAG_OPTION}` when running each training script. Below are the breif introduction to some important flags for the experiments.
+Both supervised and semi-supervised methods can be trained with different flags (hyper-parameters) by adding `--{FLAG_NAME} {FLAG_OPTION}` when running each training script. Below are the brief introduction to some important flags for the experiments.
 
 | Flag Name        | Usage  |  Comments |
 | ------------- |-------------| -----|
@@ -45,28 +43,34 @@ Both supervised and semi-supervised methods can be trained with different flags 
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
 | `apply_reco` | toggle on or off | apply with our proposed ReCo loss|
 
-Training with the fewest label setting in each dataset with full label mode presented in the paper:
+Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images) presented in the paper.
 ```
 python train_semisup.py --dataset pascal --num_labels 60 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset cityscapes --num_labels 20 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset sun --num_labels 50 --apply_aug classmix --apply_reco
 ```
 
-Training with the fewest label setting in each dataset with partial label mode presented in the paper:
+Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel)* mode presented in the paper.
 ```
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset sun --partial p0 --apply_aug classmix --apply_reco
 ```
 
+Training with ReCo is expected to require 12 - 16G of memory in a single GPU setting. All the other baselines can be trained under 12G in a single GPU setting.
+
 ### Other Notices
 1. We observe that the performance for the full label mode semi-supervised learning in CityScapes dataset is not stable across different machines, for which all baselines might drop 2-5% performance, though the ranking for all methods keeps the same. Different GPUs in the same machine do not affact the performance.  The performance for other datasets in the full label mode and all datasets in the partial label mode are consistent. 
-2.  Please use `--seed 0, 1, 2` to accurately reproduce our results with the exact same labelled and unlabelled split we used in our experiments.
+2.  Please use `--seed 0, 1, 2` to accurately reproduce/compare our results with the exactly same labelled and unlabelled split we used in our experiments.
 
 ## Citation
 If you found this code/work to be useful in your own research, please considering citing the following:
 
 PLACEHOLDER.
+
+## Contact
+If you have any questions, please contact sk.lorenmt@gmail.com.
+
 
 
 

@@ -218,8 +218,8 @@ SCHEDULE 1
 
 The Software
 
-ReCo is a pixel-level contrastive learning framework desighed in assisting learning 
-semantic segmentation with few labels. It is based on the techniques described 
+ReCo is a pixel-level contrastive learning framework designed at a regional level 
+to assist learning in semantic segmentation. It is based on the techniques described 
 in the following publication:
 
     • Shikun Liu, Shuaifeng Zhi, Edward Johns, Andrew J. Davison. Bootstrapping 

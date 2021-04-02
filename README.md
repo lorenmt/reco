@@ -21,7 +21,7 @@ In this paper, we introduce two different training modes for semi-supervised lea
 1. Full Labels Partial Dataset: A sparse subset of training images has full ground-truth labels, with the remaining data unlabelled.
 2. Partial Labels Full Dataset: All images have some labels, but covering only a sparse subset of pixels.
 
-Running the following four scripts would train each mode with supervised or semi-supervised methods respectively.
+Running the following four scripts would train each mode with supervised or semi-supervised methods respectively:
 ```
 python train_sup.py             # Supervised learning with full labels.
 python train_semisup.py         # Semi-supervised learning with full labels.
@@ -45,21 +45,21 @@ All supervised and semi-supervised methods can be trained with different flags (
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
 | `apply_reco` | toggle on or off | apply with our proposed ReCo loss|
 
-Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images) presented in the paper.
+Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images) presented in the paper:
 ```
 python train_semisup.py --dataset pascal --num_labels 60 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset cityscapes --num_labels 20 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset sun --num_labels 50 --apply_aug classmix --apply_reco
 ```
 
-Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel) mode presented in the paper.
+Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel) mode presented in the paper:
 ```
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset sun --partial p0 --apply_aug classmix --apply_reco
 ```
 
-Training ReCo + Supervised with all labelled data.
+Training ReCo + Supervised with all labelled data:
 ```
 python train_sup.py --dataset {DATASET} --num_labels 0 --apply_reco
 ```
@@ -72,8 +72,14 @@ Training with ReCo is expected to require 12 - 16G of memory in a single GPU set
 
 ## Citation
 If you found this code/work to be useful in your own research, please considering citing the following:
-
-PLACEHOLDER.
+```
+@inproceedings{liu2021reco,
+    title={Bootstrapping Semantic Segmentation with Regional Contrast,
+    author={Shikun Liu and Shuaifeng Zhi and Edward Johns and Andrew Davison},
+    booktitle={arXiv preprint},
+    year={2021},
+}
+```
 
 ## Contact
 If you have any questions, please contact sk.lorenmt@gmail.com.

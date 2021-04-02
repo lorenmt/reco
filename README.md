@@ -1,6 +1,6 @@
 # ReCo - Regional Contrast
 
-This repository contains the source code of Regional Contrast (ReCo) and baselines from the paper, [Bootstrapping Semantic Segmentation with Regional Contrast](https://shikun.io/assets/files/reco/reco.pdf), introduced by [Shikun Liu](https://shikun.io/), [Shuaifeng Zhi](https://shuaifengzhi.com/), [Edward Johns](https://www.robot-learning.uk/), and [Andrew Davison](https://www.doc.ic.ac.uk/~ajd/).
+This repository contains the source code of ReCo and baselines from the paper, [Bootstrapping Semantic Segmentation with Regional Contrast](https://shikun.io/assets/files/reco/reco.pdf), introduced by [Shikun Liu](https://shikun.io/), [Shuaifeng Zhi](https://shuaifengzhi.com/), [Edward Johns](https://www.robot-learning.uk/), and [Andrew Davison](https://www.doc.ic.ac.uk/~ajd/).
 
 Check out [the project page](https://shikun.io/projects/regional-contrast) for more visualisations. (under-development, will release soon)
 
@@ -14,7 +14,7 @@ ReCo is evaluated with three datasets **CityScapes**, **PASCAL VOC** and **SUN R
 
 After making sure all datasets having been placed and downloaded successfully, run each processing file `python dataset/{DATASET}_preprocess.py` in the dataset respectively to pre-process each dataset for the experiments. The preprocessing file also includes generating partial label for Cityscapes and Pascal dataset with three random seeds. Feel free to modify the partial label size and random seed to suit your own research setting.
 
-For the lazy ones: just download the off-the-shelf pre-processed datasets here [CityScapes](https://www.dropbox.com/sh/1eeq4qi9g2n6la2/AAD4IK1oskNPUzfTuusMqfb7a?dl=0), [Pascal VOC](https://www.dropbox.com/sh/gaoqumpylcci3he/AABjenlsGet060yhGXVxobE4a?dl=0) and [SUN RGB-D](https://www.dropbox.com/sh/miq8361xxbricp5/AAD8E74uWKwELbHmhAyGshCfa?dl=0).
+For the lazy ones: just download the off-the-shelf pre-processed datasets here: [CityScapes](https://www.dropbox.com/sh/1eeq4qi9g2n6la2/AAD4IK1oskNPUzfTuusMqfb7a?dl=0), [Pascal VOC](https://www.dropbox.com/sh/gaoqumpylcci3he/AABjenlsGet060yhGXVxobE4a?dl=0) and [SUN RGB-D](https://www.dropbox.com/sh/miq8361xxbricp5/AAD8E74uWKwELbHmhAyGshCfa?dl=0).
 
 ## Training Supervised and Semi-supervised Models
 In this paper, we introduce two different training modes for semi-supervised learning.

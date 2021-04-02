@@ -43,16 +43,16 @@ All supervised and semi-supervised methods can be trained with different flags (
 | `apply_aug` | semi-supervised methods for data augmentation, choose `cutout, cutmix, classmix` | only available in the semi-supervised methods; our implementations for [CutOut, CutMix](https://arxiv.org/abs/1906.01916) and [ClassMix](https://arxiv.org/abs/2007.07936)|
 | `weak_threshold` | weak threshold `delta_w` in active sampling | only applied when training with ReCo loss|
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
-| `apply_reco` | toggle on or off | apply with our proposed ReCo loss|
+| `apply_reco` | toggle on or off | apply our proposed ReCo loss|
 
-Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images) presented in the paper:
+Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images):
 ```
 python train_semisup.py --dataset pascal --num_labels 60 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset cityscapes --num_labels 20 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset sun --num_labels 50 --apply_aug classmix --apply_reco
 ```
 
-Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel) mode presented in the paper:
+Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel):
 ```
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco

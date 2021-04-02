@@ -38,7 +38,7 @@ Both supervised and semi-supervised methods can be trained with different flags 
 | `num_queries` | number of queries sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `output_dim` | output dimension for pixel-level representation | only applied when training with ReCo loss|
 | `temp` | temperature used in contrastive learning | only applied when training with ReCo loss|
-| `apply_aug` | semi-supervised methods for data augmentation, choose `cutout, cutmix, classmix](https://arxiv.org/abs/2007.07936)` | only available in the semi-supervised methods for our implementations for [CutOut, CutMix](https://arxiv.org/abs/1906.01916) and [ClassMix](https://arxiv.org/abs/2007.07936)|
+| `apply_aug` | semi-supervised methods for data augmentation, choose `cutout, cutmix, classmix` | only available in the semi-supervised methods for our implementations for [CutOut, CutMix](https://arxiv.org/abs/1906.01916) and [ClassMix](https://arxiv.org/abs/2007.07936)|
 | `weak_threshold` | weak threshold `delta_w` in active sampling | only applied when training with ReCo loss|
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
 | `apply_reco` | toggle on or off | apply with our proposed ReCo loss|

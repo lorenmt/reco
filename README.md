@@ -52,7 +52,7 @@ python train_semisup.py --dataset cityscapes --num_labels 20 --apply_aug classmi
 python train_semisup.py --dataset sun --num_labels 50 --apply_aug classmix --apply_reco
 ```
 
-Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel)* mode presented in the paper.
+Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel) mode presented in the paper.
 ```
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco

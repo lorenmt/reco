@@ -102,7 +102,7 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
         for i in range(valid_seg):
             # sample hard queries
             if len(seg_feat_hard_list[i]) > 0:
-                seg_hard_idx = torch.randint(len(seg_feat_hard_list[i]), size=(num_pixels,))
+                seg_hard_idx = torch.randint(len(seg_feat_hard_list[i]), size=(num_queries,))
                 anchor_feat_hard = seg_feat_hard_list[i][seg_hard_idx]
                 anchor_feat = anchor_feat_hard
             else:
@@ -117,9 +117,9 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
                 proto_sim = torch.cosine_similarity(seg_proto[seg_mask[0]].unsqueeze(0), seg_proto[seg_mask[1:]], dim=1)
                 proto_prob = torch.softmax(proto_sim / temp, dim=0)
 
-                # sampling negative samples based on the generated distribution [num_pixels x num_negatives per class]
+                # sampling negative samples based on the generated distribution [num_queries x num_negatives per class]
                 negative_dist = torch.distributions.categorical.Categorical(probs=proto_prob)
-                samp_class = negative_dist.sample(sample_shape=[num_pixels, num_negatives])
+                samp_class = negative_dist.sample(sample_shape=[num_queries, num_negatives])
                 samp_num = torch.stack([(samp_class == c).sum(1) for c in range(len(proto_prob))], dim=1)
 
                 # sample negative indices from each segment
@@ -128,14 +128,14 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
 
                 # index negative feature (from other segments)
                 negative_feat_all = torch.cat(seg_feat_all_list[i+1:] + seg_feat_all_list[:i])
-                negative_feat = negative_feat_all[negative_index].reshape(num_pixels, num_negatives, num_feat)
+                negative_feat = negative_feat_all[negative_index].reshape(num_queries, num_negatives, num_feat)
 
                 # combine positive and negative feature
-                positive_feat = seg_proto[i].unsqueeze(0).unsqueeze(0).repeat(num_pixels, 1, 1)
+                positive_feat = seg_proto[i].unsqueeze(0).unsqueeze(0).repeat(num_queries, 1, 1)
                 all_feat = torch.cat((positive_feat, negative_feat), dim=1)
 
             seg_logits = torch.cosine_similarity(anchor_feat.unsqueeze(1), all_feat, dim=2)
-            reco_loss = reco_loss + F.cross_entropy(seg_logits / temp, torch.zeros(num_pixels).long().to(device))
+            reco_loss = reco_loss + F.cross_entropy(seg_logits / temp, torch.zeros(num_queries).long().to(device))
         return reco_loss / valid_seg
 
 

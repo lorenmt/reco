@@ -69,7 +69,7 @@ Training with ReCo is expected to require 12 - 16G of memory in a single GPU set
 ## Visualisation on Pre-trained Models
 We additionally provide the pre-trained baselines and our method for 20 labelled Cityscapes and 60 labelled Pascal VOC, as examples for visualisation. The precise mIoU performance for each model is listed in the following table. The pre-trained models will produce the exact same qualitative results presented in the original paper.  
 
- |  | Supervised        |  ClassMix  |  ClassMix + ReCo |
+ |  | Supervised        |  ClassMix  |  ReCo + ClassMix |
 -------| ------------- |-------------| -----|
 CityScapes (20 Labels) | 38.10 [[link]](https://www.dropbox.com/s/q6txvxnlhjzood0/cityscapes_label20_sup.pth?dl=0) | 45.13 [[link]](https://www.dropbox.com/s/eyrs1n9vifikfas/cityscapes_label20_semi_classmix.pth?dl=0) | 50.14 [[link]](https://www.dropbox.com/s/aa1lcsrxujo9t4v/cityscapes_label20_semi_classmix_reco.pth?dl=0) |
 Pascal VOC (60 Labels) | 36.06 [[link]](https://www.dropbox.com/s/lhmlvea3kmqrfc7/pascal_label60_sup.pth?dl=0) | 53.71 [[link]](https://www.dropbox.com/s/v6nlbmg9apboc0c/pascal_label60_semi_classmix.pth?dl=0) | 57.12 [[link]](https://www.dropbox.com/s/xsxawpix5mtpi69/pascal_label60_semi_classmix_reco.pth?dl=0) |

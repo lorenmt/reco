@@ -99,6 +99,7 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
         seg_proto = torch.cat(seg_proto_list)
         valid_seg = len(seg_num_list)
         seg_len = torch.arange(valid_seg)
+
         for i in range(valid_seg):
             # sample hard queries
             if len(seg_feat_hard_list[i]) > 0:
@@ -130,7 +131,7 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
                 negative_feat_all = torch.cat(seg_feat_all_list[i+1:] + seg_feat_all_list[:i])
                 negative_feat = negative_feat_all[negative_index].reshape(num_queries, num_negatives, num_feat)
 
-                # combine positive and negative feature
+                # combine positive and negative keys
                 positive_feat = seg_proto[i].unsqueeze(0).unsqueeze(0).repeat(num_queries, 1, 1)
                 all_feat = torch.cat((positive_feat, negative_feat), dim=1)
 

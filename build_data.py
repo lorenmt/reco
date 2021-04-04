@@ -162,6 +162,8 @@ def get_pascal_idx(root, train=True, label_num=5):
             mask = np.array(Image.open(root + '/SegmentationClassAug/{}.png'.format(idx)))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)   # number of unique classes
+
+            # sample image if it includes the lowest appeared class and with more than 3 distinctive classes
             if len(labeled_idx) == 0 and unique_num >= 3:
                 labeled_idx.append(idx)
                 label_counter[mask_unique] += 1
@@ -171,7 +173,7 @@ def get_pascal_idx(root, train=True, label_num=5):
             else:
                 save_idx.append(idx)
 
-            # record any segmentation index with lowest occurrence
+            # record any segmentation index with lowest appearance
             label_fill = np.where(label_counter == label_counter.min())[0]
 
         return labeled_idx, [idx for idx in idx_list if idx not in labeled_idx]
@@ -205,6 +207,8 @@ def get_cityscapes_idx(root, train=True, label_num=5):
             mask = cityscapes_class_map(np.array(Image.open(root + '/labels/train/{}.png'.format(idx))))
             mask_unique = np.unique(mask)[:-1] if 255 in mask else np.unique(mask)  # remove void class
             unique_num = len(mask_unique)  # number of unique classes
+
+            # sample image if it includes the lowest appeared class and with more than 12 distinctive classes
             if len(labeled_idx) == 0 and unique_num >= 12:
                 labeled_idx.append(idx)
                 label_counter[mask_unique] += 1
@@ -235,6 +239,7 @@ def get_sun_idx(root, train=True, label_num=5):
         idx_list_ = idx_list.copy()
         random.shuffle(idx_list_)
 
+        # create a label dictionary class_list [[Image_ID for class 0], [Image_ID for class 1], ...]
         class_list = [[] for _ in range(37)]
         for i in range(len(idx_list_)):
             idx = idx_list_[i]
@@ -246,7 +251,7 @@ def get_sun_idx(root, train=True, label_num=5):
         label_counter = np.zeros(37)
         label_fill = np.arange(37)
         ignore_val = []
-        ignore_mask = np.ones(37, dtype=bool)
+        ignore_mask = np.ones(37, dtype=bool)  # store any semantic id has sampled all possible images
         while len(labeled_idx) < label_num:
             if len(class_list[label_fill[0]]) > 0:
                 idx = class_list[label_fill[0]].pop()
@@ -254,6 +259,7 @@ def get_sun_idx(root, train=True, label_num=5):
                 ignore_val.append(label_fill[0])
                 ignore_mask[ignore_val] = False
 
+            # sample image by the current lowest appeared class
             if idx not in labeled_idx:
                 labeled_idx.append(idx)
                 mask = sun_class_map(np.array(Image.open(root + '/sunrgbd_train_test_labels/img-{:06d}.png'.format(idx))))
@@ -419,7 +425,7 @@ class BuildDataLoader:
 # Create Color-mapping for visualisation
 # --------------------------------------------------------------------------------
 def create_cityscapes_label_colormap():
-  """Creates a label colormap used in CITYSCAPES segmentation benchmark.
+  """Creates a label colormap used in CityScapes segmentation benchmark.
   Returns:
     A colormap for visualizing segmentation results.
   """
@@ -447,7 +453,7 @@ def create_cityscapes_label_colormap():
 
 
 def create_pascal_label_colormap():
-  """Creates a label colormap used in PASCAL segmentation benchmark.
+  """Creates a label colormap used in Pascal segmentation benchmark.
   Returns:
     A colormap for visualizing segmentation results.
   """
@@ -477,7 +483,7 @@ def create_pascal_label_colormap():
 
 
 def create_sun_label_colormap():
-  """Creates a label colormap used in PASCAL segmentation benchmark.
+  """Creates a label colormap used in SUN RGB-D segmentation benchmark.
   Returns:
     A colormap for visualizing segmentation results.
   """
@@ -523,7 +529,7 @@ def create_sun_label_colormap():
 
 
 def create_nyuv2_label_colormap():
-  """Creates a label colormap used in PASCAL segmentation benchmark.
+  """Creates a label colormap used in NYUv2 segmentation benchmark.
   Returns:
     A colormap for visualizing segmentation results.
   """

@@ -83,11 +83,11 @@ Download the pre-trained models with the links above, then create and place them
 ## Citation
 If you found this code/work to be useful in your own research, please considering citing the following:
 ```
-@inproceedings{liu2021reco,
-    title={Bootstrapping Semantic Segmentation with Regional Contrast,
-    author={Shikun Liu and Shuaifeng Zhi and Edward Johns and Andrew Davison},
-    booktitle={arXiv preprint},
-    year={2021},
+@article{liu2021reco,
+    title={Bootstrapping Semantic Segmentation with Regional Contrast},
+    author={Liu, Shikun and Zhi, Shuaifeng and Johns, Edward and Davison, Andrew J},
+    journal={arXiv preprint arXiv:2104.04465},
+    year={2021}
 }
 ```
 

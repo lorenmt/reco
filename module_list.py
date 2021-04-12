@@ -70,21 +70,21 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
     # compute valid binary mask for each pixel
     valid_pixel = label * mask
 
-    # permute representation for indexing: batch x im_h x im_w x feature
+    # permute representation for indexing: batch x im_h x im_w x feature_channel
     rep = rep.permute(0, 2, 3, 1)
 
-    # compute prototype for each segment across all valid pixels
+    # compute prototype (class mean representation) for each class across all valid pixels
     seg_feat_all_list = []
     seg_feat_hard_list = []
     seg_num_list = []
     seg_proto_list = []
     for i in range(num_segments):
-        valid_pixel_seg = valid_pixel[:, i]  # select binary mask for i-th segment
+        valid_pixel_seg = valid_pixel[:, i]  # select binary mask for i-th class
         if valid_pixel_seg.sum() == 0:  # not all classes would be available in a mini-batch
             continue
 
         prob_seg = prob[:, i, :, :]
-        rep_mask_hard = (prob_seg < strong_threshold) * valid_pixel_seg.bool()
+        rep_mask_hard = (prob_seg < strong_threshold) * valid_pixel_seg.bool()  # select hard queries
 
         seg_proto_list.append(torch.mean(rep[valid_pixel_seg.bool()], dim=0, keepdim=True))
         seg_feat_all_list.append(rep[valid_pixel_seg.bool()])
@@ -92,7 +92,7 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
         seg_num_list.append(int(valid_pixel_seg.sum().item()))
 
     # compute regional contrastive loss
-    if len(seg_num_list) <= 1:
+    if len(seg_num_list) <= 1:  # in some rare cases, a small mini-batch might only contain 1 or no semantic class
         return torch.tensor(0.0)
     else:
         reco_loss = torch.tensor(0.0)
@@ -106,32 +106,32 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
                 seg_hard_idx = torch.randint(len(seg_feat_hard_list[i]), size=(num_queries,))
                 anchor_feat_hard = seg_feat_hard_list[i][seg_hard_idx]
                 anchor_feat = anchor_feat_hard
-            else:
+            else:  # in some rare cases, all queries in the current query class are easy
                 continue
 
-            # apply negative key sampling
+            # apply negative key sampling (with no gradients)
             with torch.no_grad():
-                # generate index mask for current segment
+                # generate index mask for the current query class; e.g. [0, 1, 2] -> [1, 2, 0] -> [2, 0, 1]
                 seg_mask = torch.cat(([seg_len[i:], seg_len[:i]]))
 
                 # compute similarity for each negative segment prototype (semantic class relation graph)
                 proto_sim = torch.cosine_similarity(seg_proto[seg_mask[0]].unsqueeze(0), seg_proto[seg_mask[1:]], dim=1)
                 proto_prob = torch.softmax(proto_sim / temp, dim=0)
 
-                # sampling negative samples based on the generated distribution [num_queries x num_negatives per class]
+                # sampling negative keys based on the generated distribution [num_queries x num_negatives]
                 negative_dist = torch.distributions.categorical.Categorical(probs=proto_prob)
                 samp_class = negative_dist.sample(sample_shape=[num_queries, num_negatives])
                 samp_num = torch.stack([(samp_class == c).sum(1) for c in range(len(proto_prob))], dim=1)
 
-                # sample negative indices from each segment
+                # sample negative indices from each negative class
                 negative_num_list = seg_num_list[i+1:] + seg_num_list[:i]
                 negative_index = negative_index_sampler(samp_num, negative_num_list)
 
-                # index negative feature (from other segments)
+                # index negative keys (from other classes)
                 negative_feat_all = torch.cat(seg_feat_all_list[i+1:] + seg_feat_all_list[:i])
                 negative_feat = negative_feat_all[negative_index].reshape(num_queries, num_negatives, num_feat)
 
-                # combine positive and negative keys
+                # combine positive and negative keys: keys = [positive key | negative keys] with 1 + num_negative dim
                 positive_feat = seg_proto[i].unsqueeze(0).unsqueeze(0).repeat(num_queries, 1, 1)
                 all_feat = torch.cat((positive_feat, negative_feat), dim=1)
 

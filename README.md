@@ -2,11 +2,11 @@
 
 This repository contains the source code of ReCo and baselines from the paper, [Bootstrapping Semantic Segmentation with Regional Contrast](https://arxiv.org/abs/2104.04465), introduced by [Shikun Liu](https://shikun.io/), [Shuaifeng Zhi](https://shuaifengzhi.com/), [Edward Johns](https://www.robot-learning.uk/), and [Andrew Davison](https://www.doc.ic.ac.uk/~ajd/).
 
-Check out [the project page](https://shikun.io/projects/regional-contrast) for more visualisations. 
+Check out [our project page](https://shikun.io/projects/regional-contrast) for more qualitative results. 
 
 
 ## Datasets
-ReCo is evaluated with three datasets **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, from which **CityScapes** and **PASCAL VOC** are additionally evaluated with partial label mode. 
+ReCo is evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, among which **CityScapes** and **PASCAL VOC** are additionally evaluated in the partial label mode. 
 
 - For CityScapes, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/): `leftImg8bit_trainvaltest.zip` and `gtFine_trainvaltest.zip`. Create and extract them to the corresponding `dataset/cityscapes` folder.
 - For Pascal VOC, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar): `VOCtrainval_11-May-2012.tar` and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip): `SegmentationClassAug.zip`. Extract the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/pascal` folder.
@@ -17,7 +17,7 @@ After making sure all datasets having been downloaded and placed correctly, run 
 For the lazy ones: just download the off-the-shelf pre-processed datasets here: [CityScapes](https://www.dropbox.com/sh/1eeq4qi9g2n6la2/AAD4IK1oskNPUzfTuusMqfb7a?dl=0), [Pascal VOC](https://www.dropbox.com/sh/gaoqumpylcci3he/AABjenlsGet060yhGXVxobE4a?dl=0) and [SUN RGB-D](https://www.dropbox.com/sh/miq8361xxbricp5/AAD8E74uWKwELbHmhAyGshCfa?dl=0).
 
 ## Training Supervised and Semi-supervised Models
-In this paper, we introduce two different training modes for semi-supervised learning.
+In this paper, we introduce two novel training modes for semi-supervised learning.
 1. Full Labels Partial Dataset: A sparse subset of training images has full ground-truth labels, with the remaining data unlabelled.
 2. Partial Labels Full Dataset: All images have some labels, but covering only a sparse subset of pixels.
 
@@ -30,12 +30,12 @@ python train_semisup_patial.py  # Semi-supervised learning with partial labels.
 ```
 
 ### Important Flags
-All supervised and semi-supervised methods can be trained with different flags (hyper-parameters) when running each training script. We now briefly introduce some important flags for the experiments.
+All supervised and semi-supervised methods can be trained with different flags (hyper-parameters) when running each training script. We briefly introduce some important flags for the experiments below.
 
 | Flag Name        | Usage  |  Comments |
 | ------------- |-------------| -----|
 | `num_labels`     | number of labelled images in the training set, choose `0` for training all labelled images  | only available in the full label mode  |
-| `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixels respectively  | only available in the partial label mode |
+| `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixel(s) respectively  | only available in the partial label mode |
 | `num_negatives` | number of negative keys sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `num_queries` | number of queries sampled for each class in each mini-batch | only applied when training with ReCo loss|
 | `output_dim` | dimensionality for pixel-level representation | only applied when training with ReCo loss|
@@ -45,14 +45,14 @@ All supervised and semi-supervised methods can be trained with different flags (
 | `strong_threshold` | strong threshold `delta_s` in active sampling | only applied when training with ReCo loss|
 | `apply_reco` | toggle on or off | apply our proposed ReCo loss|
 
-Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes have appeared at least in 4 images):
+Training ReCo + ClassMix with the fewest **full** label setting in each dataset (the least appeared classes in each dataset have appeared in 5 training images):
 ```
 python train_semisup.py --dataset pascal --num_labels 60 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset cityscapes --num_labels 20 --apply_aug classmix --apply_reco
 python train_semisup.py --dataset sun --num_labels 50 --apply_aug classmix --apply_reco
 ```
 
-Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class only has 1 labelled pixel):
+Training ReCo + ClassMix with the fewest **partial** label setting in each dataset (each class in each training image only has 1 labelled pixel):
 ```
 python train_semisup_partial.py --dataset pascal --partial p0 --apply_aug classmix --apply_reco
 python train_semisup_partial.py --dataset cityscapes --partial p0 --apply_aug classmix --apply_reco

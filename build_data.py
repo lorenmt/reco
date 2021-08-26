@@ -50,6 +50,7 @@ def transform(image, label, logits=None, crop_size=(512, 512), scale_size=(0.8, 
     if augmentation:
         # Random color jitter
         if torch.rand(1) > 0.2:
+            #  color_transform = transforms.ColorJitter((0.75, 1.25), (0.75, 1.25), (0.75, 1.25), (-0.25, 0.25))  For PyTorch 1.9/TorchVision 0.10 users
             color_transform = transforms.ColorJitter.get_params((0.75, 1.25), (0.75, 1.25), (0.75, 1.25), (-0.25, 0.25))
             image = color_transform(image)
 

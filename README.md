@@ -5,8 +5,11 @@ This repository contains the source code of ReCo and baselines from the paper, [
 Check out [our project page](https://shikun.io/projects/regional-contrast) for more qualitative results. 
 
 
+## Updates
+**Aug. 2021** -- For PyTorch 1.9 users, you may encounter a small bug in `ColorJitter` data augmentation function due to version mismatch, which I have now provided a solution in the comment.
+
 ## Datasets
-ReCo is evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, among which **CityScapes** and **PASCAL VOC** are additionally evaluated in the partial label mode. 
+ReCo was implemented by *PyTorch 1.7* and *TorchVision 0.8*, and evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, among which **CityScapes** and **PASCAL VOC** are additionally evaluated in the partial label mode. 
 
 - For CityScapes, please download the original dataset from the [official CityScapes site](https://www.cityscapes-dataset.com/downloads/): `leftImg8bit_trainvaltest.zip` and `gtFine_trainvaltest.zip`. Create and extract them to the corresponding `dataset/cityscapes` folder.
 - For Pascal VOC, please download the original training images from the [official PASCAL site](http://host.robots.ox.ac.uk/pascal/VOC/voc2012/VOCtrainval_11-May-2012.tar): `VOCtrainval_11-May-2012.tar` and the augmented labels [here](http://vllab1.ucmerced.edu/~whung/adv-semi-seg/SegmentationClassAug.zip): `SegmentationClassAug.zip`. Extract the folder `JPEGImages` and `SegmentationClassAug` into the corresponding `dataset/pascal` folder.

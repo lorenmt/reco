@@ -6,6 +6,7 @@ import argparse
 import matplotlib.pylab as plt
 
 from network.deeplabv3.deeplabv3 import *
+from network.deeplabv2 import *
 from build_data import *
 from module_list import *
 
@@ -24,6 +25,7 @@ parser.add_argument('--num_negatives', default=512, type=int, help='number of ne
 parser.add_argument('--num_queries', default=256, type=int, help='number of queries per segment per image')
 parser.add_argument('--output_dim', default=256, type=int, help='output dimension from representation head')
 parser.add_argument('--temp', default=0.5, type=float)
+parser.add_argument('--backbone', default='deeplabv3p', type=str, help='choose backbone: deeplabv3p, deeplabv2')
 parser.add_argument('--seed', default=0, type=int)
 
 args = parser.parse_args()
@@ -37,7 +39,10 @@ train_l_loader, test_loader = data_loader.build(supervised=True)
 
 # Loader Semantic Network
 device = torch.device("cuda:{:d}".format(args.gpu) if torch.cuda.is_available() else "cpu")
-model = DeepLabv3Plus(models.resnet101(pretrained=True), num_classes=data_loader.num_segments, output_dim=args.output_dim).to(device)
+if args.backbone == 'deeplabv3p':
+    model = DeepLabv3Plus(models.resnet101(pretrained=True), num_classes=data_loader.num_segments, output_dim=args.output_dim).to(device)
+elif args.backbone == 'deeplabv2':
+    model = DeepLabv2(models.resnet101(pretrained=True), num_classes=data_loader.num_segments, output_dim=args.output_dim).to(device)
 
 total_epoch = 200
 optimizer = optim.SGD(model.parameters(), lr=args.lr, weight_decay=args.weight_decay, momentum=0.9, nesterov=True)

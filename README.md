@@ -8,6 +8,8 @@ Check out [our project page](https://shikun.io/projects/regional-contrast) for m
 ## Updates
 **Aug. 2021** -- For PyTorch 1.9 users, you may encounter a small bug in `ColorJitter` data augmentation function due to version mismatch, which I have now provided a solution in the comment.
 
+**Oct. 2021** -- Updated DeepLabv2 backbone.
+
 ## Datasets
 ReCo was implemented by *PyTorch 1.7* and *TorchVision 0.8*, and evaluated with three datasets: **CityScapes**, **PASCAL VOC** and **SUN RGB-D** in the full label mode, among which **CityScapes** and **PASCAL VOC** are additionally evaluated in the partial label mode. 
 
@@ -37,6 +39,7 @@ All supervised and semi-supervised methods can be trained with different flags (
 
 | Flag Name        | Usage  |  Comments |
 | ------------- |-------------| -----|
+| `backbone`     | choose semantic segmentation backbone model: `deeplabv3p, deeplabv2`  |  DeepLabv3+ works better and faster  |
 | `num_labels`     | number of labelled images in the training set, choose `0` for training all labelled images  | only available in the full label mode  |
 | `partial`     |  percentage of labeled pixels for each class in the training set, choose `p0, p1, p5, p25` for training 1, 1%, 5%, 25% labelled pixel(s) respectively  | only available in the partial label mode |
 | `num_negatives` | number of negative keys sampled for each class in each mini-batch | only applied when training with ReCo loss|
@@ -80,8 +83,9 @@ Pascal VOC (60 Labels) | 36.06 [[link]](https://www.dropbox.com/s/lhmlvea3kmqrfc
 Download the pre-trained models with the links above, then create and place them into the folder `model_weights` in this repository. Run `python visual.py` to visualise the results.
 
 ### Other Notices
-1. We observe that the performance for the full label semi-supervised setting in CityScapes dataset is not stable across different machines, for which all methods may drop 2-5% performance, though the ranking keeps the same. Different GPUs in the same machine do not affect the performance.  The performance for the other datasets in the full label mode, and the performance for all datasets in the partial label mode is consistent. 
-2.  Please use `--seed 0, 1, 2` to accurately reproduce/compare our results with the exactly same labelled and unlabelled split we used in our experiments.
+1. We observe that the performance for the fully labelled semi-supervised CityScapes is not stable across different machines, for which all methods may drop 2-5% performance, though the ranking keeps the same. Different GPUs in the same machine do not affect the performance.  The performance for the other datasets in the full label mode, and the performance for all datasets in the partial label mode is consistent and stable.
+2. The current data sampling strategy in full label mode is designed for choosing very few labelled data (< 20%), to achieve a balanced class distribution (sample new images which must contain the least sampled class in previous sampled images, and the number of classes in each image much be more than a defined threshold). If you plan to use the code to evaluate on more labelled data, please change the `unique_num` in each `get_DATASET_idx` function to 1 (number of class threshold in each image), or you can completely remove this sampling strategy by sampling training data randomly.
+3.  Please use `--seed 0, 1, 2` to accurately reproduce/compare our results with the exactly same labelled and unlabelled split we used in our experiments.
 
 ## Citation
 If you found this code/work to be useful in your own research, please considering citing the following:

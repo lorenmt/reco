@@ -1,27 +1,13 @@
 import torch
-import torch.nn.functional as F
+import torch.nn.functional as nn_Func
 import numpy as np
 import os
-import copy
-
 from torch.optim.lr_scheduler import _LRScheduler
-import torchvision.transforms.functional as transforms_f
 
 
-# --------------------------------------------------------------------------------
-# Define EMA: Mean Teacher Framework
-# --------------------------------------------------------------------------------
-class EMA(object):
-    def __init__(self, model, alpha):
-        self.step = 0
-        self.model = copy.deepcopy(model)
-        self.alpha = alpha
 
-    def update(self, model):
-        decay = min(1 - 1 / (self.step + 1), self.alpha)
-        for ema_param, param in zip(self.model.parameters(), model.parameters()):
-            ema_param.data = decay * ema_param.data + (1 - decay) * param.data
-        self.step += 1
+
+
 
 # --------------------------------------------------------------------------------
 # Define Polynomial Decay
@@ -43,18 +29,18 @@ class PolyLR(_LRScheduler):
 # --------------------------------------------------------------------------------
 def compute_supervised_loss(predict, target, reduction=True):
     if reduction:
-        loss = F.cross_entropy(predict, target, ignore_index=-1)
+        loss = nn_Func.cross_entropy(predict, target, ignore_index=-1)
     else:
-        loss = F.cross_entropy(predict, target, ignore_index=-1, reduction='none')
+        loss = nn_Func.cross_entropy(predict, target, ignore_index=-1, reduction='none')
     return loss
 
 
 def compute_unsupervised_loss(predict, target, logits, strong_threshold):
     batch_size = predict.shape[0]
     valid_mask = (target >= 0).float()   # only count valid pixels
-
-    weighting = logits.view(batch_size, -1).ge(strong_threshold).sum(-1) / valid_mask.view(batch_size, -1).sum(-1)
-    loss = F.cross_entropy(predict, target, reduction='none', ignore_index=-1)
+    
+    weighting = logits.reshape(batch_size, -1).ge(strong_threshold).sum(-1) / valid_mask.view(batch_size, -1).sum(-1)
+    loss = nn_Func.cross_entropy(predict, target, reduction='none', ignore_index=-1)
     weighted_loss = torch.mean(torch.masked_select(weighting[:, None, None] * loss, loss > 0))
     return weighted_loss
 
@@ -62,7 +48,7 @@ def compute_unsupervised_loss(predict, target, logits, strong_threshold):
 # --------------------------------------------------------------------------------
 # Define ReCo loss
 # --------------------------------------------------------------------------------
-def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, num_queries=256, num_negatives=256):
+def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, num_queries=256, num_negatives=256,attenuation=0.05):
     batch_size, num_feat, im_w_, im_h = rep.shape
     num_segments = label.shape[1]
     device = rep.device
@@ -136,8 +122,8 @@ def compute_reco_loss(rep, label, mask, prob, strong_threshold=1.0, temp=0.5, nu
                 all_feat = torch.cat((positive_feat, negative_feat), dim=1)
 
             seg_logits = torch.cosine_similarity(anchor_feat.unsqueeze(1), all_feat, dim=2)
-            reco_loss = reco_loss + F.cross_entropy(seg_logits / temp, torch.zeros(num_queries).long().to(device))
-        return reco_loss / valid_seg
+            reco_loss = reco_loss + nn_Func.cross_entropy(seg_logits / temp, torch.zeros(num_queries).long().to(device))
+        return attenuation*reco_loss / valid_seg
 
 
 def negative_index_sampler(samp_num, seg_num_list):
@@ -192,33 +178,14 @@ def label_onehot(inputs, num_segments):
     return outputs.scatter_(1, inputs.unsqueeze(1), 1.0)
 
 
-def denormalise(x, imagenet=True):
-    if imagenet:
-        x = transforms_f.normalize(x, mean=[0., 0., 0.], std=[1 / 0.229, 1 / 0.224, 1 / 0.225])
-        x = transforms_f.normalize(x, mean=[-0.485, -0.456, -0.406], std=[1., 1., 1.])
-        return x
-    else:
-        return (x + 1) / 2
-
-
 def create_folder(save_dir):
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
 
-def tensor_to_pil(im, label, logits):
-    im = denormalise(im)
-    im = transforms_f.to_pil_image(im.cpu())
-
-    label = label.float() / 255.
-    label = transforms_f.to_pil_image(label.unsqueeze(0).cpu())
-
-    logits = transforms_f.to_pil_image(logits.unsqueeze(0).cpu())
-    return im, label, logits
-
-
 # --------------------------------------------------------------------------------
 # Define semi-supervised methods (based on data augmentation)
+# TODO : move it to data_augmentation
 # --------------------------------------------------------------------------------
 def generate_cutout_mask(img_size, ratio=2):
     cutout_area = img_size[0] * img_size[1] / ratio
@@ -252,6 +219,7 @@ def generate_unsup_data(data, target, logits, mode='cutout'):
     new_data = []
     new_target = []
     new_logits = []
+    
     for i in range(batch_size):
         if mode == 'cutout':
             mix_mask = generate_cutout_mask([im_h, im_w], ratio=2).to(device)
@@ -260,17 +228,22 @@ def generate_unsup_data(data, target, logits, mode='cutout'):
             new_data.append((data[i] * mix_mask).unsqueeze(0))
             new_target.append(target[i].unsqueeze(0))
             new_logits.append((logits[i] * mix_mask).unsqueeze(0))
-            continue
-
-        if mode == 'cutmix':
-            mix_mask = generate_cutout_mask([im_h, im_w]).to(device)
-        if mode == 'classmix':
-            mix_mask = generate_class_mask(target[i]).to(device)
-
-        new_data.append((data[i] * mix_mask + data[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
-        new_target.append((target[i] * mix_mask + target[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
-        new_logits.append((logits[i] * mix_mask + logits[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
-
+            
+        else:
+            if mode == 'cutmix':
+                mix_mask = generate_cutout_mask([im_h, im_w]).to(device)
+            elif mode == 'classmix':
+                mix_mask = generate_class_mask(target[i]).to(device)
+            elif mode == "None":
+                mix_mask= torch.ones([im_h, im_w]).float().to(device)
+            else:
+               print(f"mode {mode} not not implemented")
+               assert False
+            new_data.append((data[i] * mix_mask + data[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
+            new_target.append((target[i] * mix_mask + target[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
+            new_logits.append((logits[i] * mix_mask + logits[(i + 1) % batch_size] * (1 - mix_mask)).unsqueeze(0))
+    
     new_data, new_target, new_logits = torch.cat(new_data), torch.cat(new_target), torch.cat(new_logits)
+    
     return new_data, new_target.long(), new_logits
 

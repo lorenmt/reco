@@ -49,8 +49,8 @@ class DeepLabv3Plus(nn.Module):
 
     def _nostride_dilate(self, m, dilate):
         classname = m.__class__.__name__
-        if classname.find('Conv') != -1:
-            # the convolution with stride
+        if classname.find('Conv') != -1:# if it's a convolution
+
             if m.stride == (2, 2):
                 m.stride = (1, 1)
                 if m.kernel_size == (3, 3):
@@ -79,5 +79,15 @@ class DeepLabv3Plus(nn.Module):
         x_low = self.project(x_low)
         output_feature = F.interpolate(feature, size=x_low.shape[2:], mode='bilinear', align_corners=True)
         prediction = self.classifier(torch.cat([x_low, output_feature], dim=1))
-        representation = self.representation(torch.cat([x_low, output_feature], dim=1))
-        return prediction, representation
+        
+
+        if self.training:
+            representation = self.representation(torch.cat([x_low, output_feature], dim=1))
+        
+            prediction=torch.nn.Upsample(scale_factor=4,mode='bilinear',align_corners =True)(prediction)#should we set align_corners =False
+        
+            return prediction, representation
+        else:
+            prediction=torch.nn.Upsample(scale_factor=4,mode='bilinear',align_corners =True)(prediction)#should we set align_corners =False
+        
+            return prediction
